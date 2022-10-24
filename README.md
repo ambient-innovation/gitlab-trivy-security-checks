@@ -50,7 +50,7 @@ container_scanning_frontend:
 ## Show reports in the Merge-Request UI
 To show a report-widget with all the errors found in the Merge-Request widget, you need to a) set `allow_failure: true` in your scanning jobs and b) create another job to run in one of the following stages (can be an own stage or you can reuse one of your existing stages).  
 This secondary job will then read the report files from your scanning jobs, combine them and report them as code-quality to GitLab.  
-Here's an example of how that job could look like:
+Here's an example of how that job could look like:  
 ```yaml
 check security scan results:
   stage: posttest
@@ -75,6 +75,16 @@ check security scan results:
     reports:
       codequality: gl-codeclimate.json
 ```
+
+If all is good, you'll see a new green bar above your test results.  
+If any vulnerabilities were found, you'll see a new yellow bar above the test results in your Merge-Request:  
+![Code Quality Seal](codequality-seal.png)  
+You can then expand that section and see all the results:  
+![Major Code Quality Issues](codequality-major.jpg)  
+![Critical Code Quality Issues](codequality-critical.jpg)
+
+You can also just check the failed scanning jobs for a plaintext error report. This can also include additional details not visible in the GitLab-UI.  
+For JavaScript vulnerabilities found in a package-lock.json, it will also report the whole dependency tree to find which package caused the vulnerable version to be included in your project. (This sadly doesn't work for yarn.lock or pnpm-lock.yaml at the moment)  
 
 ## Advanced Settings  
 The container scanning job exposes a few more variables by which you can adjust the scanning if needed. The default settings are the recommendation of the TE-Circle, though.  
