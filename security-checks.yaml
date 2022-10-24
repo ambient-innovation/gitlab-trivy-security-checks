@@ -1,0 +1,34 @@
+container_scanning:
+  tags:
+    - low-load
+  stage: test
+  variables:
+    TRIVY_NO_PROGRESS: "true"
+    TRIVY_CACHE_DIR: ".trivycache/"
+    IMAGE: $IMAGE_TAG_BACKEND
+    DIRECTORY: "backend"
+    SEVERITY: "HIGH,CRITICAL"
+  before_script:
+    - export TRIVY_VERSION=$(wget -qO - "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+    - echo $TRIVY_VERSION
+    - wget --no-verbose https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O - | tar -zxvf -
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  allow_failure: true
+  script:
+    # Image report
+    - ./trivy image --exit-code 0 --ignore-unfixed --severity $SEVERITY --security-checks vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >/dev/null 2>&1
+    # Filesystem report
+    - ./trivy filesystem --exit-code 0 --ignore-unfixed --severity $SEVERITY --security-checks config,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >/dev/null 2>&1
+    # Combine report
+    - apk update && apk add jq
+    - jq -s 'add' gl-codeclimate-image.json gl-codeclimate-fs.json > gl-codeclimate-${DIRECTORY}.json
+    - ./trivy image --exit-code 1 --ignore-unfixed --severity $SEVERITY --security-checks vuln --format table $IMAGE || IMAGE_CODE=$?
+    - ./trivy filesystem --exit-code 1 --ignore-unfixed --severity $SEVERITY --security-checks config,vuln --dependency-tree --format table $DIRECTORY || FILE_CODE=$?
+    - exit $((IMAGE_CODE+FILE_CODE))
+  cache:
+    paths:
+      - .trivycache/
+  artifacts:
+    paths:
+      - "gl-codeclimate-$DIRECTORY.json"
+    when: always
