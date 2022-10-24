@@ -76,3 +76,18 @@ check security scan results:
     reports:
       codequality: gl-codeclimate.json
 ```
+
+## Advanced Settings  
+The container scanning job exposes a few more variables by which you can adjust the scanning if needed. The default settings are the recommendation of the TE-Circle, though.  
+
+### Change minimum severity reported
+By adding a new variable called `SEVERITY` to your job, you can change which severity items should be reported. The default is to report HIGH and CRITICAL vulnerabilities. The remaining options are: `UNKNOWN`, `LOW`, `MEDIUM`  
+Trivy requires a full list of severities to report. To report all severities from MEDIUM and higher for example, you need to specify a comma-separated list like so: `SEVERITY: "MEDIUM,HIGH,CRITICAL"`
+
+### Other settings
+By default trivy performs one run in full-silence mode writing the results to the gitlab codeclimate report file and then another one showing the results in a plaintext table. If the scan is taking very long, you can also show a progress bar during the scan by setting the `TRIVY_NO_PROGRESS` variable to `"false"`.  
+To make sure you're doing a fresh run and instruct trivy to download a fresh vulnerability database, you can turn off/move the cache directory via the `TRIVY_CACHE_DIR` variable. The default value for this variable is a directory called `.trivycache`
+
+You can add more variables corresponding to the CLI switches as documented on the trivy homepage: https://aquasecurity.github.io/trivy/latest/docs/references/customization/envs/
+
+Last, but not least, you can set up a .trivyignore file in your project's root directory and enter one CVE-ID per line to ignore that specific vulnerability. 
