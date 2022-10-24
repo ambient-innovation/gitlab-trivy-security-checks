@@ -11,7 +11,6 @@ include:
   - remote: 'https://raw.githubusercontent.com/mastacheata/security-checks/main/security-checks.yaml'
   # There might be more includes here, usually starting with template like the following:
   # - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
-'
 ```
 
 You will also need to have at least one stage called test in your top-level stages config for the default configuration:  
@@ -33,7 +32,7 @@ container_scanning:
     DIRECTORY: "backend"
 ```
 
-The example shown here will overwrite the `container_scanning` job from the template and tell it to a) scan an image as specified in the `IMAGE_TAG_FRONTEND` variable, b) also scan the filesystem in a directory called frontend and c) only report errors with a level of HIGH or CRITICAL
+The example shown here will overwrite the `container_scanning` job from the template and tell it to a) scan an image as specified in the `IMAGE_TAG_BACKEND` variable, b) also scan the filesystem in a directory called frontend and c) only report errors with a level of HIGH or CRITICAL
 
 ## Scanning multiple images/directories (i.e. frontend and backend)  
 To scan multiple images/directories, you can simply copy the job above, add another key `extends: container_scanning` and change the variable values for the other container.
