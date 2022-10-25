@@ -79,7 +79,7 @@ check security scan results:
 
 If all is good, you'll see a new green bar above your test results.  
 If any vulnerabilities were found, you'll see a new yellow bar above the test results in your Merge-Request:  
-![Code Quality Seal](codequality-seal.png)  
+![Code Quality Seal](codequality-seal.jpg)  
 You can then expand that section and see all the results:  
 ![Major Code Quality Issues](codequality-major.jpg)  
 ![Critical Code Quality Issues](codequality-critical.jpg)
