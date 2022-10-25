@@ -8,7 +8,8 @@ This config template can be included in your `.gitlab-ci.yml` to get the scannin
 At the very top of your .gitlab-ci.yml either add or expand the `include:` section so it looks similar to this:  
 ```yaml
 include:
-  - remote: 'https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ambient-innovation.com/circle-tech-evangelists/security-checks/-/raw/main/security-checks.yaml'
+  - project: 'circle-tech-evangelists/security-checks'
+    file: 'security-checks.yaml'
   # There might be more includes here, usually starting with template like the following:
   # - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
 ```
