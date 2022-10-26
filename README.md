@@ -1,4 +1,8 @@
 # Motivation
+The Dependency Scanning feature can automatically find security vulnerabilities in your software dependencies while you’re developing and testing your applications. For example, dependency scanning lets you know if your application uses an external (open source) library that is known to be vulnerable. You can then take action to protect your application.
+
+Dependency Scanning is often considered part of Software Composition Analysis (SCA). SCA can contain aspects of inspecting the items your code uses. These items typically include application and system dependencies that are almost always imported from external sources, rather than sourced from items you wrote yourself.
+
 The included gitlab container scanning only scans docker images and can't read lockfiles.  
 To fix this, you need to run a Trivy instance yourself and tell it to scan the filesystem instead.  
 
