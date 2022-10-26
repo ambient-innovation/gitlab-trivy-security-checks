@@ -83,10 +83,10 @@ check security scan results:
 
 If all is good, you'll see a new green bar above your test results.  
 If any vulnerabilities were found, you'll see a new yellow bar above the test results in your Merge-Request:  
-![Code Quality Seal](codequality-seal.jpg)  
+![Code Quality Seal](images/codequality-seal.jpg)  
 You can then expand that section and see all the results:  
-![Major Code Quality Issues](codequality-major.jpg)  
-![Critical Code Quality Issues](codequality-critical.jpg)
+![Major Code Quality Issues](images/codequality-major.jpg)  
+![Critical Code Quality Issues](images/codequality-critical.jpg)
 
 You can also just check the failed scanning jobs for a plaintext error report. This can also include additional details not visible in the GitLab-UI.  
 For JavaScript vulnerabilities found in a package-lock.json, it will also report the whole dependency tree to find which package caused the vulnerable version to be included in your project. (This sadly doesn't work for yarn.lock or pnpm-lock.yaml at the moment)  
