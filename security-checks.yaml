@@ -4,6 +4,10 @@ container_scanning:
   stage: test
   variables:
     TRIVY_NO_PROGRESS: "true"
+    # Set to "backend" and "frontend" in the respective jobs in mono-repos.
+    DIRECTORY: "./"
+    # Is like that for backward-compatibility, previously we only had DIRECTORY.
+    FILENAME: "gl-codeclimate-$DIRECTORY.json"
     TRIVY_CACHE_DIR: "trivycache/"
     SEVERITY: "HIGH,CRITICAL"
   before_script:
@@ -21,7 +25,7 @@ container_scanning:
     - ./trivy filesystem --exit-code 0 --ignore-unfixed --severity $SEVERITY --security-checks config,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >/dev/null 2>&1 || true
     # Combine report
     - apk update && apk add jq
-    - jq -s 'add' gl-codeclimate-image.json gl-codeclimate-fs.json > gl-codeclimate-${DIRECTORY}.json
+    - jq -s 'add' gl-codeclimate-image.json gl-codeclimate-fs.json > ${FILENAME}
     - ./trivy image --exit-code 1 --ignore-unfixed --severity $SEVERITY --security-checks vuln --format table $IMAGE || IMAGE_CODE=$?
     - ./trivy filesystem --exit-code 1 --ignore-unfixed --severity $SEVERITY --security-checks config,vuln --dependency-tree --format table $DIRECTORY || FILE_CODE=$?
     - exit $((IMAGE_CODE+FILE_CODE))
@@ -30,5 +34,5 @@ container_scanning:
       - .trivycache/
   artifacts:
     paths:
-      - "gl-codeclimate-$DIRECTORY.json"
+      - $FILENAME
     when: always
