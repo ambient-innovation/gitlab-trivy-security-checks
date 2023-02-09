@@ -37,7 +37,7 @@ container_scanning:
     DIRECTORY: "backend"
 ```
 
-The example shown here will overwrite the `container_scanning` job from the template and tell it to a) scan an image as specified in the `IMAGE_TAG_BACKEND` variable, b) also scan the filesystem in a directory called frontend and c) only report errors with a level of HIGH or CRITICAL
+The example shown here will overwrite the `container_scanning` job from the template and tell it to a) scan an image as specified in the `IMAGE_TAG_BACKEND` variable, b) also scan the filesystem in a directory called frontend and c) only report errors with a level of HIGH or CRITICAL. You can also specify the `FILENAME` of the result-output as you like. 
 
 ## Scanning multiple images/directories (i.e. frontend and backend)  
 To scan multiple images/directories, you can simply copy the job above, add another key `extends: container_scanning` and change the variable values for the other container.
@@ -51,6 +51,20 @@ container_scanning_frontend:
     IMAGE: $IMAGE_TAG_FRONTEND
     DIRECTORY: "frontend"
 ```
+
+## Scanning non-monorepo project 
+If you have no subdirectory (e.g. because you have a simple Django fullstack project), you need to set the `DIRECTORY` and `FILENAME`, as in this example:
+
+```yaml
+container_scanning_frontend:
+  extends:
+    - container_scanning
+  variables:
+    IMAGE: $IMAGE_TAG_FRONTEND
+    DIRECTORY: "./"
+    FILENAME: "gl-codeclimate.json"
+```
+
 
 ## Show reports in the Merge-Request UI
 To show a report-widget with all the errors found in the Merge-Request widget, you need to a) set `allow_failure: true` in your scanning jobs and b) create another job to run in one of the following stages (can be an own stage or you can reuse one of your existing stages).  
