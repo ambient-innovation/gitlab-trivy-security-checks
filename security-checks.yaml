@@ -4,7 +4,7 @@ container_scanning:
   stage: test
   variables:
     TRIVY_NO_PROGRESS: "true"
-    TRIVY_CACHE_DIR: ".trivycache/"
+    TRIVY_CACHE_DIR: "trivycache/"
     SEVERITY: "HIGH,CRITICAL"
   before_script:
     - export TRIVY_VERSION=$(wget -qO - "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
