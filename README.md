@@ -82,9 +82,9 @@ check security scan results:
   before_script:
     - apk update && apk add jq coreutils grep
   script:
-    - echo "Step 1: Merge all codeclimate reports from scanning jobs"
+    - echo "Step 1 - Merge all codeclimate reports from scanning jobs"
     - jq -s 'add' gl-codeclimate-*.json > gl-codeclimate.json
-    - echo "Step 2: Check if there were any vulnerabilities and exit with a status code equal to the number of vulnerabilities"
+    - echo "Step 2 - Check if there were any vulnerabilities and exit with a status code equal to the number of vulnerabilities"
     - jq '.[].type' .\gl-codeclimate.json | grep "issue" | exit $(wc -l)
   # Enables https://docs.gitlab.com/ee/user/application_security/container_scanning/ (Container Scanning report is available on GitLab EE Ultimate or GitLab.com Gold)
   artifacts:
