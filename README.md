@@ -36,7 +36,22 @@ container_scanning:
     DIRECTORY: "backend"
 ```
 
-The example shown here will overwrite the `container_scanning` job from the template and tell it to a) scan an image as specified in the `IMAGE_TAG_BACKEND` variable, b) also scan the filesystem in a directory called frontend and c) only report errors with a level of HIGH or CRITICAL. You can also specify the `FILENAME` of the result-output as you like. 
+The example shown here will overwrite the `container_scanning` job from the template and tell it to
+
+a) scan an image as specified in the `IMAGE_TAG_BACKEND` variable,\
+b) also scan the filesystem in a directory called frontend and\
+c) only report errors with a level of HIGH or CRITICAL. 
+
+You can also specify the `FILENAME` of the result-output as you like. 
+
+**Note:** If you wish to run the `container_scanning` job in another job than "`test`" (as it does per default) simply copy the above code to your .gitlab-ci.yml file and add the keyword `stage` with your custom stage name.
+
+Example for minimal stage-overwrite setup:
+
+```yaml
+container_scanning:
+  stage: my-custom-stage
+```
 
 ## Scanning multiple images/directories (i.e. frontend and backend)  
 To scan multiple images/directories, you can simply copy the job above, add another key `extends: container_scanning` and change the variable values for the other container.
