@@ -24,7 +24,8 @@ container_scanning:
     # Filesystem report
     - ./trivy filesystem --exit-code 0 --ignore-unfixed --severity $SEVERITY --scanners config,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >/dev/null 2>&1 || true
     # Combine report
-    - apk update && apk add jq
+    - apk update && apk add jq sed
+    - FILENAME=$(echo $FILENAME | sed -e 's|[\.\/]|-|g')
     - jq -s 'add' gl-codeclimate-image.json gl-codeclimate-fs.json > ${FILENAME}
     - ./trivy image --exit-code 1 --ignore-unfixed --severity $SEVERITY --scanners vuln --format table $IMAGE || IMAGE_CODE=$?
     - ./trivy filesystem --exit-code 1 --ignore-unfixed --severity $SEVERITY --scanners config,vuln --dependency-tree --format table $DIRECTORY || FILE_CODE=$?
