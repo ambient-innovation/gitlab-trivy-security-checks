@@ -132,4 +132,4 @@ To make sure you're doing a fresh run and instruct trivy to download a fresh vul
 
 You can add more variables corresponding to the CLI switches as documented on the trivy homepage: https://aquasecurity.github.io/trivy/latest/docs/references/customization/envs/
 
-Last, but not least, you can set up a .trivyignore file in your project's root directory and enter one CVE-ID per line to ignore that specific vulnerability. 
+Last, but not least, you can set up a .trivyignore file in your project's root directory and enter one Vulnerability-ID per line to ignore that specific vulnerability. See the trivy documentation for more (and up-to-date) info: https://aquasecurity.github.io/trivy/v0.38/docs/vulnerability/examples/filter/#by-vulnerability-ids
