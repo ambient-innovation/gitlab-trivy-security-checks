@@ -20,14 +20,14 @@ container_scanning:
   allow_failure: true
   script:
     # Image report
-    - ./trivy image --exit-code 0 --ignore-unfixed --severity $SEVERITY --security-checks vuln --vuln-type os --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >/dev/null 2>&1 || true
+    - ./trivy image --exit-code 0 --ignore-unfixed --severity $SEVERITY --scanners vuln --vuln-type os --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >/dev/null 2>&1 || true
     # Filesystem report
-    - ./trivy filesystem --exit-code 0 --ignore-unfixed --severity $SEVERITY --security-checks config,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >/dev/null 2>&1 || true
+    - ./trivy filesystem --exit-code 0 --ignore-unfixed --severity $SEVERITY --scanners config,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >/dev/null 2>&1 || true
     # Combine report
     - apk update && apk add jq
     - jq -s 'add' gl-codeclimate-image.json gl-codeclimate-fs.json > ${FILENAME}
-    - ./trivy image --exit-code 1 --ignore-unfixed --severity $SEVERITY --security-checks vuln --format table $IMAGE || IMAGE_CODE=$?
-    - ./trivy filesystem --exit-code 1 --ignore-unfixed --severity $SEVERITY --security-checks config,vuln --dependency-tree --format table $DIRECTORY || FILE_CODE=$?
+    - ./trivy image --exit-code 1 --ignore-unfixed --severity $SEVERITY --scanners vuln --format table $IMAGE || IMAGE_CODE=$?
+    - ./trivy filesystem --exit-code 1 --ignore-unfixed --severity $SEVERITY --scanners config,vuln --dependency-tree --format table $DIRECTORY || FILE_CODE=$?
     - exit $((IMAGE_CODE+FILE_CODE))
   cache:
     paths:
