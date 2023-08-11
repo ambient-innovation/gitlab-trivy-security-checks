@@ -41,7 +41,7 @@ c) only report errors with a level of HIGH or CRITICAL.
 
 You can also specify the `FILENAME` of the result-output as you like. 
 
-**Note:** If you wish to run the `container_scanning` job in another job than "`test`" (as it does per default) simply copy the above code to your .gitlab-ci.yml file and add the keyword `stage` with your custom stage name.
+**Note:** If you wish to run the `container_scanning` job in another job than "`test`" (as it does by default) simply copy the above code to your .gitlab-ci.yml file and add the keyword `stage` with your custom stage name.
 
 Example for minimal stage-overwrite setup:
 
@@ -122,10 +122,6 @@ The container scanning job exposes a few more variables by which you can adjust 
 ### Change minimum severity reported
 By adding a new variable called `SEVERITY` to your job, you can change which severity items should be reported. The default is to report HIGH and CRITICAL vulnerabilities. The remaining options are: `UNKNOWN`, `LOW`, `MEDIUM`  
 Trivy requires a full list of severities to report. To report all severities from MEDIUM and higher for example, you need to specify a comma-separated list like so: `SEVERITY: "MEDIUM,HIGH,CRITICAL"`
-
-### Ignore False-Positives from package.json that are overridden via yarn/npm-specific settings
-If your project uses the `resolutions` key from yarn or the `overrides` key from npm in package.json to override sub-dependency-versions, trivy's image scanner will find false-positive security problems for these packages. As we include a second scan for filesystem vulnerabilities, you can safely add package.json to trivy's skipped files in order for it to stop overreporting.  
-Simply add a new variable called `TRIVY_SKIP_FILES` with a value of `/**/package.json` to your frontend container_scanning job and it will ignore these.
 
 ### Other settings
 By default trivy performs one run in full-silence mode writing the results to the gitlab codeclimate report file and then another one showing the results in a plaintext table. If the scan is taking very long, you can also show a progress bar during the scan by setting the `TRIVY_NO_PROGRESS` variable to `"false"`.  

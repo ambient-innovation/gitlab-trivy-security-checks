@@ -8,7 +8,7 @@ container_scanning:
     DIRECTORY: "./"
     # Is like that for backward-compatibility, previously we only had DIRECTORY.
     FILENAME: "gl-codeclimate-$DIRECTORY.json"
-    TRIVY_CACHE_DIR: "trivycache/"
+    TRIVY_CACHE_DIR: ".trivycache/"
     SEVERITY: "HIGH,CRITICAL"
   before_script:
     - if [ ! -e ${TRIVY_CACHE_DIR} ]; then mkdir -p ${TRIVY_CACHE_DIR}; fi
@@ -28,7 +28,7 @@ container_scanning:
     - FILENAME=$(echo $FILENAME | sed -e 's|[\.\/]|-|g' | sed -e 's|-json$|.json|g')
     - echo $FILENAME
     - jq -s 'add' gl-codeclimate-image.json gl-codeclimate-fs.json > ${FILENAME}
-    - ./trivy image --exit-code 1 --ignore-unfixed --severity $SEVERITY --scanners vuln --format table $IMAGE || IMAGE_CODE=$?
+    - ./trivy image --exit-code 1 --ignore-unfixed --severity $SEVERITY --scanners vuln --vuln-type os --format table $IMAGE || IMAGE_CODE=$?
     - ./trivy filesystem --exit-code 1 --ignore-unfixed --severity $SEVERITY --scanners config,vuln --dependency-tree --format table $DIRECTORY || FILE_CODE=$?
     - exit $((IMAGE_CODE+FILE_CODE))
   cache:
