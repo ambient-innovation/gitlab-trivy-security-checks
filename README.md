@@ -127,6 +127,6 @@ Trivy requires a full list of severities to report. To report all severities fro
 By default trivy performs one run in full-silence mode writing the results to the gitlab codeclimate report file and then another one showing the results in a plaintext table. If the scan is taking very long, you can also show a progress bar during the scan by setting the `TRIVY_NO_PROGRESS` variable to `"false"`.  
 To make sure you're doing a fresh run and instruct trivy to download a fresh vulnerability database, you can turn off/move the cache directory via the `TRIVY_CACHE_DIR` variable. The default value for this variable is a directory called `.trivycache`
 
-You can add more variables corresponding to the CLI switches as documented on the trivy homepage: https://aquasecurity.github.io/trivy/latest/docs/references/customization/envs/
+You can add more variables corresponding to the CLI switches as documented on the trivy homepage: https://aquasecurity.github.io/trivy/v0.44/docs/configuration/#environment-variables
 
-Last, but not least, you can set up a .trivyignore file in your project's root directory and enter one Vulnerability-ID per line to ignore that specific vulnerability. See the trivy documentation for more (and up-to-date) info: https://aquasecurity.github.io/trivy/v0.38/docs/vulnerability/examples/filter/#by-vulnerability-ids
+Last, but not least, you can set up a .trivyignore file in your project's root directory and enter one Vulnerability-ID per line to ignore that specific vulnerability. See the trivy documentation for more (and up-to-date) info: https://aquasecurity.github.io/trivy/v0.44/docs/configuration/filtering/#by-finding-ids
