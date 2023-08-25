@@ -16,6 +16,7 @@ container_scanning:
     - echo $TRIVY_VERSION
     - if [ ! -e ${TRIVY_CACHE_DIR}trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz ]; then wget --no-verbose https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O ${TRIVY_CACHE_DIR}trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz; fi
     - tar -zxvf ${TRIVY_CACHE_DIR}trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -C .
+    - until docker info; do sleep 1; done # Mitigate GitLab-Runner not setting up DinD in time, see: https://gitlab.com/gitlab-org/gitlab/-/issues/354744
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   allow_failure: true
   script:
