@@ -1,7 +1,13 @@
+variables:
+  - DOCKER_VERSION: 24.0.6-dind
+
 container_scanning:
   tags:
-    - low-load
+    - small-runner
   stage: test
+  services:
+    - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:${DOCKER_VERSION}
+      alias: docker
   variables:
     TRIVY_NO_PROGRESS: "true"
     # Set to "backend" and "frontend" in the respective jobs in mono-repos.
