@@ -28,9 +28,9 @@ container_scanning:
   allow_failure: true
   script:
     # Image report
-    - ./trivy image --exit-code 0 --ignore-unfixed --severity $SEVERITY --scanners vuln --vuln-type os --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >/dev/null 2>&1 || true
+    - ./trivy image --exit-code 0 --ignore-unfixed --severity $SEVERITY --scanners vuln --vuln-type os --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >trivy-image.log 2>&1 || true
     # Filesystem report
-    - ./trivy filesystem --exit-code 0 --ignore-unfixed --severity $SEVERITY --scanners config,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >/dev/null 2>&1 || true
+    - ./trivy filesystem --exit-code 0 --ignore-unfixed --severity $SEVERITY --scanners config,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >trivy-fs.log 2>&1 || true
     # Combine report
     - apk update && apk add jq sed
     - jq -s 'add' gl-codeclimate-image.json gl-codeclimate-fs.json > ${FILENAME}
@@ -43,4 +43,6 @@ container_scanning:
   artifacts:
     paths:
       - $FILENAME
+      - trivy-fs.log
+      - trivy-image.log
     when: always
