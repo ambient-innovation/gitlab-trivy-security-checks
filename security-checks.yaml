@@ -2,11 +2,12 @@ variables:
   - DOCKER_VERSION: 24.0.6
 
 container_scanning:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:${DOCKER_VERSION}
   tags:
     - small-runner
   stage: test
   services:
-    - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:${DOCKER_VERSION}-dind
+    - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:${DOCKER_VERSION}
       alias: docker
   variables:
     TRIVY_NO_PROGRESS: "true"
