@@ -10,7 +10,8 @@ container_scanning:
     TRIVY_USERNAME: "$CI_REGISTRY_USER"
     TRIVY_PASSWORD: "$CI_REGISTRY_PASSWORD"
     TRIVY_AUTH_URL: "$CI_REGISTRY"
-    TRIVY_SEVERITY: "HIGH,CRITICAL"
+    SEVERITY: "HIGH,CRITICAL"
+    TRIVY_SEVERITY: "$SEVERITY"    
     TRIVY_CACHE_DIR: ".trivycache/"
     # Set to "backend" and "frontend" in the respective jobs in mono-repos.
     DIRECTORY: "./"
