@@ -78,7 +78,7 @@ container_scanning_frontend:
 
 
 ## Show reports in the Merge-Request UI
-To show a report-widget with all the errors found in the Merge-Request widget, you need to a) set `allow_failure: true` in your scanning jobs and b) create another job to run in one of the following stages (can be an own stage or you can reuse one of your existing stages).  
+To have one combined job to set a pass/fail condition for all the errors found in any of the trivy scan jobs, you need to a) set `allow_failure: true` in your scanning jobs and b) create another job to run in one of the following stages (can be an own stage or you can reuse one of your existing stages).  
 This secondary job will then read the report files from your scanning jobs, combine them and report them as code-quality to GitLab.  
 Here's an example of how that job could look like:  
 ```yaml
@@ -102,8 +102,6 @@ check security scan results:
   artifacts:
     paths:
       - gl-codeclimate.json
-    reports:
-      codequality: gl-codeclimate.json
 ```
 
 If all is good, you'll see a new green bar above your test results.  
@@ -127,6 +125,8 @@ Trivy requires a full list of severities to report. To report all severities fro
 By default trivy performs one run in full-silence mode writing the results to the gitlab codeclimate report file and then another one showing the results in a plaintext table. If the scan is taking very long, you can also show a progress bar during the scan by setting the `TRIVY_NO_PROGRESS` variable to `"false"`.  
 To make sure you're doing a fresh run and instruct trivy to download a fresh vulnerability database, you can turn off/move the cache directory via the `TRIVY_CACHE_DIR` variable. The default value for this variable is a directory called `.trivycache`
 
-You can add more variables corresponding to the CLI switches as documented on the trivy homepage: https://aquasecurity.github.io/trivy/v0.44/docs/configuration/#environment-variables
+You can add more variables corresponding to the CLI switches as [documented on the trivy homepage](https://aquasecurity.github.io/trivy/v0.48/docs/references/configuration/cli/trivy/)  
+NOTE: This link points to the reference as of v0.48 - December 2023, make sure to check the latest version for changes in newer versions.
 
-Last, but not least, you can set up a .trivyignore file in your project's root directory and enter one Vulnerability-ID per line to ignore that specific vulnerability. See the trivy documentation for more (and up-to-date) info: https://aquasecurity.github.io/trivy/v0.44/docs/configuration/filtering/#by-finding-ids
+Last, but not least, you can set up a .trivyignore file in your project's root directory and enter one Vulnerability-ID per line to ignore that specific vulnerability. See the [trivy documentation](https://aquasecurity.github.io/trivy/v0.48/docs/configuration/filtering/#by-finding-ids) for more (and up-to-date) info.  
+NOTE: This link points to the reference as of v0.48 - December 2023, make sure to check the latest version for changes in newer versions.
