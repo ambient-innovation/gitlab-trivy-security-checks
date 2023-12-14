@@ -22,9 +22,9 @@ container_scanning:
   allow_failure: true
   script:
     # Image report (Operating System Vulnerabilities)
-    - trivy image --exit-code 0 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners vuln --vuln-type os --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >/dev/null 2>&1 || true
+    - trivy image --exit-code 0 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners vuln --vuln-type os --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >trivy-image.log 2>&1 || true
     # Filesystem report (Source Dependency Vulnerabilities)
-    - trivy filesystem --exit-code 0 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners misconfig,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >/dev/null 2>&1 || true
+    - trivy filesystem --exit-code 0 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners misconfig,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >trivy-fs.log 2>&1 || true
     # Report results as table
     # Image report (Operating System Vulnerabilities)
     - trivy image --exit-code 1 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners vuln --vuln-type os --format table $IMAGE || IMAGE_CODE=$?
@@ -40,6 +40,8 @@ container_scanning:
   artifacts:
     paths:
       - $FILENAME
+      - trivy-fs.log
+      - trivy-image.log
     reports:
       codequality: $FILENAME
     when: always
