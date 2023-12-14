@@ -1,41 +1,38 @@
-variables:
-  - DOCKER_VERSION: 24.0.6
-
 container_scanning:
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:${DOCKER_VERSION}
+  image: 
+    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/aquasec/trivy
+    entrypoint: [""]
   tags:
     - small-runner
   stage: test
-  services:
-    - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:${DOCKER_VERSION}
-      alias: docker
   variables:
     TRIVY_NO_PROGRESS: "true"
+    TRIVY_USERNAME: "$CI_REGISTRY_USER"
+    TRIVY_PASSWORD: "$CI_REGISTRY_PASSWORD"
+    TRIVY_AUTH_URL: "$CI_REGISTRY"
+    SEVERITY: "HIGH,CRITICAL"
+    TRIVY_SEVERITY: "$SEVERITY"    
+    TRIVY_CACHE_DIR: ".trivycache/"
     # Set to "backend" and "frontend" in the respective jobs in mono-repos.
     DIRECTORY: "./"
     # Is like that for backward-compatibility, previously we only had DIRECTORY.
     FILENAME: "gl-codeclimate-$CI_JOB_NAME_SLUG.json"
-    TRIVY_CACHE_DIR: ".trivycache/"
-    SEVERITY: "HIGH,CRITICAL"
   before_script:
     - if [ ! -e ${TRIVY_CACHE_DIR} ]; then mkdir -p ${TRIVY_CACHE_DIR}; fi
-    - export TRIVY_VERSION=$(wget -qO - "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
-    - echo $TRIVY_VERSION
-    - if [ ! -e ${TRIVY_CACHE_DIR}trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz ]; then wget --no-verbose https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O ${TRIVY_CACHE_DIR}trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz; fi
-    - tar -zxvf ${TRIVY_CACHE_DIR}trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -C .
-    - until docker info; do sleep 1; done # Mitigate GitLab-Runner not setting up DinD in time, see: https://gitlab.com/gitlab-org/gitlab/-/issues/354744
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   allow_failure: true
   script:
-    # Image report
-    - ./trivy image --exit-code 0 --ignore-unfixed --severity $SEVERITY --scanners vuln --vuln-type os --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >trivy-image.log 2>&1 || true
-    # Filesystem report
-    - ./trivy filesystem --exit-code 0 --ignore-unfixed --severity $SEVERITY --scanners config,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >trivy-fs.log 2>&1 || true
+    # Image report (Operating System Vulnerabilities)
+    - trivy image --exit-code 0 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners vuln --vuln-type os --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >trivy-image.log 2>&1 || true
+    # Filesystem report (Source Dependency Vulnerabilities)
+    - trivy filesystem --exit-code 0 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners misconfig,vuln --format template --template "@contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >trivy-fs.log 2>&1 || true
+    # Report results as table
+    # Image report (Operating System Vulnerabilities)
+    - trivy image --exit-code 1 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners vuln --vuln-type os --format table $IMAGE || IMAGE_CODE=$?
+    # Filesystem report (Source Dependency Vulnerabilities)
+    - trivy filesystem --exit-code 1 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners misconfig,vuln --dependency-tree --format table $DIRECTORY || FILE_CODE=$?
     # Combine report
     - apk update && apk add jq sed
     - jq -s 'add' gl-codeclimate-image.json gl-codeclimate-fs.json > ${FILENAME}
-    - ./trivy image --exit-code 1 --ignore-unfixed --severity $SEVERITY --scanners vuln --vuln-type os --format table $IMAGE || IMAGE_CODE=$?
-    - ./trivy filesystem --exit-code 1 --ignore-unfixed --severity $SEVERITY --scanners config,vuln --dependency-tree --format table $DIRECTORY || FILE_CODE=$?
     - exit $((IMAGE_CODE+FILE_CODE))
   cache:
     paths:
@@ -45,4 +42,6 @@ container_scanning:
       - $FILENAME
       - trivy-fs.log
       - trivy-image.log
+    reports:
+      codequality: $FILENAME
     when: always
