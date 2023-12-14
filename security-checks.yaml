@@ -40,4 +40,6 @@ container_scanning:
   artifacts:
     paths:
       - $FILENAME
+    reports:
+      codequality: $FILENAME
     when: always
