@@ -1,4 +1,4 @@
-container_scanning:
+.container_scanning:
   image: 
     name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/aquasec/trivy
     entrypoint: [""]
