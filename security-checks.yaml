@@ -1,5 +1,4 @@
 include:
   - remote: https://raw.githubusercontent.com/ambient-innovation/gitlab-trivy-security-checks/main/security-checks.template.yaml
 
-container_scanning:
-  extends: [ .container_scanning ]
+container_scanning: !reference [ .container_scanning ]
