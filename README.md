@@ -41,13 +41,39 @@ c) only report errors with a level of HIGH or CRITICAL.
 
 You can also specify the `FILENAME` of the result-output as you like. 
 
-**Note:** If you wish to run the `container_scanning` job in another job than "`test`" (as it does by default) simply copy the above code to your .gitlab-ci.yml file and add the keyword `stage` with your custom stage name.
+### Full configuration
+If you wish to run the `container_scanning` job in another job than "`test`" (as it does by default) simply copy the above code to your .gitlab-ci.yml file and add the keyword `stage` with your custom stage name.
 
 Example for minimal stage-overwrite setup:
 
 ```yaml
 container_scanning:
   stage: my-custom-stage
+```
+
+If you want to customise the job name, the above method will not work because the original job will be added to the pipeline in addition to any job that extends it.
+
+To be able to fully customise the pipeline job, replace the entry in `include` like so:
+```yaml
+include:
+  - remote: https://raw.githubusercontent.com/ambient-innovation/gitlab-trivy-security-checks/main/security-checks.template.yaml
+```
+
+Note the file name change at the end.
+
+With this file, the job will not be added to the pipeline automatically anymore, and to enable it you will have to extend it. For example:
+```yaml
+# Any name goes.
+frontend:container scanning:
+  # Notice the . at the start.
+  extends: [ .container_scanning ]
+  # Any stage you like, you don't need to include a `test` stage anymore.
+  stage: container scanning
+
+# You can now have a uniform interface for different parts of the application:
+backend:container scanning:
+  extends: [ .container_scanning ]
+  stage: container scanning
 ```
 
 ## Scanning multiple images/directories (i.e. frontend and backend)  

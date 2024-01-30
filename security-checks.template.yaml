@@ -1,0 +1,47 @@
+.container_scanning:
+  image: 
+    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/aquasec/trivy
+    entrypoint: [""]
+  tags:
+    - small-runner
+  stage: test
+  variables:
+    TRIVY_NO_PROGRESS: "true"
+    TRIVY_USERNAME: "$CI_REGISTRY_USER"
+    TRIVY_PASSWORD: "$CI_REGISTRY_PASSWORD"
+    TRIVY_AUTH_URL: "$CI_REGISTRY"
+    SEVERITY: "HIGH,CRITICAL"
+    TRIVY_SEVERITY: "$SEVERITY"
+    TRIVY_CACHE_DIR: ".trivycache/"
+    # Set to "backend" and "frontend" in the respective jobs in mono-repos.
+    DIRECTORY: "./"
+    # Is like that for backward-compatibility, previously we only had DIRECTORY.
+    FILENAME: "gl-codeclimate-$CI_JOB_NAME_SLUG.json"
+  before_script:
+    - if [ ! -e ${TRIVY_CACHE_DIR} ]; then mkdir -p ${TRIVY_CACHE_DIR}; fi
+  allow_failure: true
+  script:
+    # Image report (Operating System Vulnerabilities)
+    - trivy image --exit-code 0 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners vuln --vuln-type os --format template --template "@/contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >trivy-image.log 2>&1 || true
+    # Filesystem report (Source Dependency Vulnerabilities)
+    - trivy filesystem --exit-code 0 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners misconfig,vuln --format template --template "@/contrib/gitlab-codequality.tpl" -o gl-codeclimate-fs.json $DIRECTORY >trivy-fs.log 2>&1 || true
+    # Report results as table
+    # Image report (Operating System Vulnerabilities)
+    - trivy image --exit-code 1 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners vuln --vuln-type os --format table $IMAGE || IMAGE_CODE=$?
+    # Filesystem report (Source Dependency Vulnerabilities)
+    - trivy filesystem --exit-code 1 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners misconfig,vuln --dependency-tree --format table $DIRECTORY || FILE_CODE=$?
+    # Combine report
+    - apk update && apk add jq sed
+    - jq -s 'add' gl-codeclimate-image.json gl-codeclimate-fs.json > ${FILENAME}
+    - exit $((IMAGE_CODE+FILE_CODE))
+  cache:
+    paths:
+      - .trivycache/
+  artifacts:
+    paths:
+      - $FILENAME
+      - trivy-fs.log
+      - trivy-image.log
+    reports:
+      codequality: $FILENAME
+    when: always
