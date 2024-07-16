@@ -1,5 +1,5 @@
 include:
-  - remote: https://raw.githubusercontent.com/ambient-innovation/gitlab-trivy-security-checks/main/security-checks.template.yaml
+  - remote: https://raw.githubusercontent.com/ambient-innovation/gitlab-trivy-security-checks/v1.0.0/security-checks.template.yaml
 
 container_scanning: 
   image: 
