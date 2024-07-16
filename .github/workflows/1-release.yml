@@ -1,0 +1,51 @@
+name: Release
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release_action:
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Semantic Release Action
+        uses: codfish/semantic-release-action@v3.4.1
+        id: semantic
+        env:
+          GITHUB_TOKEN ${{ secrets.GITHUB_TOKEN }}
+        with:
+          additional-packages: |
+            ['semantic-release-replace-plugin', '@semantic-release/git']
+          plugins: |
+            [
+              '@semantic-release/commit-analyzer',
+              '@semantic-release/release-notes-generator',
+              [
+                "semantic-release-replace-plugin",
+                {
+                  "replacements": [
+                    {
+                      "files": ["security-checks.yaml"],
+                      "from": "main",
+                      "to": "${nextRelease.version}",
+                      "results": [
+                        {
+                          "file": "security-checks.yaml",
+                          "hasChanged": true,
+                          "numMatches": 1,
+                          "numReplacements": 1
+                        }
+                      ],
+                      "countMatches": true
+                    }
+                  ]
+                }
+              ],
+              [
+                "@semantic-release/git",
+                {
+                  "assets": ["security-checks.yaml"]
+                }
+              ],
+              '@semantic-release/github'
+            ]
