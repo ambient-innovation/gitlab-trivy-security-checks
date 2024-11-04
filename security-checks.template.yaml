@@ -21,7 +21,8 @@
   before_script:
     - if [ ! -e ${TRIVY_CACHE_DIR} ]; then mkdir -p ${TRIVY_CACHE_DIR}; fi
     # Create trivyignore.yaml if it doesn't exist yet
-    - if [ ! -e ${TRIVY_IGNOREFILE_DIR} ]; then echo "ambient_trivyignore_placeholder: None" > ${TRIVY_IGNOREFILE_DIR}; fi
+    - |
+    if [ ! -e ${TRIVY_IGNOREFILE_DIR} ]; then echo "ambient_trivyignore_placeholder: None" > ${TRIVY_IGNOREFILE_DIR}; fi
   allow_failure: true
   script:
     # Image report (Operating System Vulnerabilities)
