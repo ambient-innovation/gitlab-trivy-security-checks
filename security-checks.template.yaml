@@ -20,10 +20,10 @@
     TRIVY_IGNOREFILE_DIR: "./.trivyignore.yaml"
   before_script:
     - if [ ! -e ${TRIVY_CACHE_DIR} ]; then mkdir -p ${TRIVY_CACHE_DIR}; fi
+    # Create trivyignore.yaml if it doesn't exist yet
+    - if [ ! -e ${TRIVY_IGNOREFILE_DIR} ]; then echo "ambient_trivyignore_placeholder: None" > ${TRIVY_IGNOREFILE_DIR}; fi
   allow_failure: true
   script:
-    # Create trivyignore.yaml if it doesn't exist yet
-    - touch ${TRIVY_IGNOREFILE_DIR}
     # Image report (Operating System Vulnerabilities)
     - trivy image --exit-code 0 --ignorefile ${TRIVY_IGNOREFILE_DIR} --ignore-unfixed --scanners vuln --pkg-types os --format template --template "@/contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >trivy-image.log 2>&1 || true
     # Filesystem report (Source Dependency Vulnerabilities)
