@@ -24,6 +24,8 @@ container_scanning:
     - if [ ! -e ${TRIVY_CACHE_DIR} ]; then mkdir -p ${TRIVY_CACHE_DIR}; fi
   allow_failure: true
   script:
+    # Create trivyignore.yaml if it doesn't exist yet
+    - touch ./.trivyignore.yaml
     # Image report (Operating System Vulnerabilities)
     - trivy image --exit-code 0 --ignorefile ./.trivyignore.yaml --ignore-unfixed --scanners vuln --vuln-type os --format template --template "@/contrib/gitlab-codequality.tpl" -o gl-codeclimate-image.json $IMAGE >trivy-image.log 2>&1 || true
     # Filesystem report (Source Dependency Vulnerabilities)
