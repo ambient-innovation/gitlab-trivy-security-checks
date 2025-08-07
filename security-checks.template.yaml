@@ -14,7 +14,7 @@
 #     PLUGIN_SEVERITY_MISCONFIG: "HIGH,CRITICAL"
 #     PLUGIN_PKG_TYPES_VULN: "os,library"
 #
-# For more information, see: https://github.com/ambient-innovation/trivy-scanner-templates/releases/latest
+# For more information, see: https://github.com/ambient-innovation/gitlab-trivy-codequality-template/releases/latest
 
 .container_scanning:
   extends: .trivy_scanning
@@ -29,7 +29,7 @@
     # Show deprecation warning
     - echo "⚠️  WARNING: The .container_scanning template is DEPRECATED!"
     - echo "⚠️  Please migrate to .trivy_scanning template."
-    - echo "⚠️  See migration guide: https://github.com/ambient-innovation/trivy-scanner-templates/releases/latest"
+    - echo "⚠️  See migration guide: https://github.com/ambient-innovation/gitlab-trivy-codequality-template/releases/latest"
     - echo "⚠️  This template will be removed in a future version."
     - echo "⚠️  Note: Security scanning supports both IMAGE and DIRECTORY variables!"
     - echo ""
@@ -38,4 +38,4 @@
 
 # Include the new unified template
 include:
-  - remote: 'https://github.com/ambient-innovation/gitlab-trivy-codequality-template/releases/download/v25.08.05.0/trivy-scanning.template.yaml'
+  - remote: 'https://github.com/ambient-innovation/gitlab-trivy-codequality-template/releases/download/v25.08.06.3/trivy-scanning.template.yaml'
